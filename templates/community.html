@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Dashboard</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            background-color: #333;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: #555;
+        }
+
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+        }
+
+        .post-form {
+            background-color: #fff;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-bottom: 2rem;
+        }
+
+        .post-form input, .post-form textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .post-form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .post-form button:hover {
+            background-color: #45a049;
+        }
+
+        .post {
+            background-color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border-radius: 5px;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-header h2 {
+            margin: 0;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .comment-form input {
+            flex-grow: 1;
+        }
+
+        .comment {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 5px;
+        }
+
+        .comment-header {
+            font-weight: bold;
+        }
+
+        .like-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .like-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Community Dashboard</h1>
+        <nav>
+            <a href="{{ url_for('home') }}" class="nav-button">Home</a>
+            <a href="{{ url_for('logout') }}" class="nav-button">Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="post-form">
+            <h2>Create a Post</h2>
+            <form action="/community" method="POST">
+                <input type="text" name="title" placeholder="Post Title" required>
+                <textarea name="content" rows="5" placeholder="Write your post here..." required></textarea>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+
+        {% for post in posts %}
+        <div class="post">
+            <div class="post-header">
+                <h2>{{ post.title }}</h2>
+                <!-- Like Button with POST method -->
+                <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST">
+                    <button type="submit" class="like-btn">Like ({{ post.likes }})</button>
+                </form>
+            </div>
+            <p>{{ post.content }}</p>
+            <div class="post-footer">
+                <p>By {{ post.username }} on {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <form class="comment-form" action="/add_comment/{{ post.id }}" method="POST">
+                    <input type="text" name="content" placeholder="Add a comment..." required>
+                    <button type="submit">Comment</button>
+                </form>
+            </div>
+
+            {% for comment in post.comments %}
+            <div class="comment">
+                <div class="comment-header">
+                    <strong>{{ comment.username }}</strong> - {{ comment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                </div>
+                <p>{{ comment.content }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    
+</body>
+</html>
